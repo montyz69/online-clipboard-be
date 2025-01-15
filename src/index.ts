@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import { createClient } from "redis";
 import * as dotenv from "dotenv";
+import {v4 as uuidv4} from 'uuid';
 
 
 dotenv.config();
@@ -39,9 +40,7 @@ redisClient.on("error", (err : Error) => {
     await redisClient.connect();
 })();
 
-const generateRandomId = (): string => {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-};
+
 
 app.post('/api/v1/send', async (req: any, res: any) => {
     try {
@@ -51,7 +50,7 @@ app.post('/api/v1/send', async (req: any, res: any) => {
             return res.status(400).json({ error: "Data is required" });
         }
 
-        const randomId = generateRandomId();
+        const randomId = uuidv4();
         const expirationTime = 6 * 60 * 60; 
 
         await redisClient.setEx(randomId, expirationTime, data);
